@@ -4,6 +4,10 @@ import com.cavetale.quests.util.Json;
 import com.google.gson.JsonElement;
 import org.bukkit.event.Listener;
 
+/**
+ * A singleton instance of this class represents the static aspects of
+ * a type of goal.
+ */
 public interface GoalHolder {
     Class<? extends Goal> getGoalClass();
 

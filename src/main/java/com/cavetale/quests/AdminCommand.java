@@ -1,19 +1,16 @@
 package com.cavetale.quests;
 
 import com.cavetale.core.command.CommandNode;
-import com.cavetale.quests.goal.CommandGoal;
 import com.cavetale.quests.goal.GoalType;
-import com.cavetale.quests.goal.MineBlockGoal;
+import com.cavetale.quests.goal.RegularGoalHolder;
 import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.session.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 @RequiredArgsConstructor
 public final class AdminCommand implements TabExecutor {
@@ -38,26 +35,26 @@ public final class AdminCommand implements TabExecutor {
     }
 
     boolean test(Player player, String[] args) {
-        Quest quest = Quest.newInstance();
-        quest.getTag().setCategory(QuestCategory.DEBUG);
-        quest.getTag().setTitle("Testing");
-        quest.getTag().setDescription("Learn the basics.");
-        do {
-            CommandGoal goal = (CommandGoal) GoalType.COMMAND.newGoal();
-            goal.setCommand("rules");
-            goal.setRegistered(true);
-            quest.getGoals().add(goal);
-        } while (false);
-        quest.getReward().addItemStack(new ItemStack(Material.DIAMOND));
-        quest.getReward().setMoney(1337.0);
-        plugin.sessions.of(player).addNewQuest(quest);
-        player.sendMessage("New quest added");
+        int count = 0;
+        for (GoalType goalType : GoalType.values()) {
+            if (!(goalType.holder instanceof RegularGoalHolder)) continue;
+            RegularGoalHolder holder = (RegularGoalHolder) goalType.holder;
+            Quest dailyQuest = holder.newDailyQuest();
+            dailyQuest.getReward().setMoney(100.0);
+            plugin.sessions.of(player).addNewQuest(dailyQuest);
+            count += 1;
+            Quest weeklyQuest = holder.newWeeklyQuest();
+            weeklyQuest.getReward().setMoney(1000.0);
+            plugin.sessions.of(player).addNewQuest(weeklyQuest);
+            count += 1;
+        }
+        player.sendMessage(count + " new quests added");
         return true;
     }
 
     boolean clear(Player player, String[] args) {
         int count = 0;
-        for (QuestInstance questInstance : plugin.sessions.of(player).getQuests(QuestCategory.DEBUG)) {
+        for (QuestInstance questInstance : plugin.sessions.of(player).getQuests()) {
             if (!plugin.sessions.of(player).removeQuest(questInstance)) {
                 player.sendMessage("Something went wrong: " + questInstance.getRow().getId());
                 continue;
@@ -69,43 +66,15 @@ public final class AdminCommand implements TabExecutor {
     }
 
     public static void testDailies(Session session) {
-        do {
-            Quest quest = Quest.newInstance();
-            quest.setCategory(QuestCategory.DAILY);
-            quest.getTag().setTitle("Rules Refresher");
-            CommandGoal goal = (CommandGoal) GoalType.COMMAND.newGoal();
-            goal.setCommand("rules");
-            goal.setRegistered(true);
-            quest.getGoals().add(goal);
-            quest.getReward().addItemStack(new ItemStack(Material.EMERALD));
-            quest.getReward().setMoney(500.0);
-            session.addNewQuest(quest);
-        } while (false);
-        do {
-            Quest quest = Quest.newInstance();
-            quest.setCategory(QuestCategory.DAILY);
-            quest.getTag().setTitle("Iron Miner");
-            MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
-            goal.setMaterial(Material.IRON_ORE);
-            goal.setNatural(true);
-            goal.setAmount(32);
-            quest.getGoals().add(goal);
-            quest.getReward().addItemStack(new ItemStack(Material.IRON_INGOT, 16));
-            quest.getReward().setMoney(1000.0);
-            session.addNewQuest(quest);
-        } while (false);
-        do {
-            Quest quest = Quest.newInstance();
-            quest.setCategory(QuestCategory.DAILY);
-            quest.getTag().setTitle("Diamond Miner");
-            MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
-            goal.setMaterial(Material.DIAMOND_ORE);
-            goal.setNatural(true);
-            goal.setAmount(16);
-            quest.getGoals().add(goal);
-            quest.getReward().addItemStack(new ItemStack(Material.DIAMOND, 4));
-            quest.getReward().setMoney(1000.0);
-            session.addNewQuest(quest);
-        } while (false);
+        for (GoalType goalType : GoalType.values()) {
+            if (!(goalType.holder instanceof RegularGoalHolder)) continue;
+            RegularGoalHolder holder = (RegularGoalHolder) goalType.holder;
+            Quest dailyQuest = holder.newDailyQuest();
+            dailyQuest.getReward().setMoney(100.0);
+            session.addNewQuest(dailyQuest);
+            Quest weeklyQuest = holder.newWeeklyQuest();
+            weeklyQuest.getReward().setMoney(1000.0);
+            session.addNewQuest(weeklyQuest);
+        }
     }
 }

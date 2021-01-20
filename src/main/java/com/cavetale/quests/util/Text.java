@@ -30,4 +30,12 @@ public final class Text {
         return in.substring(0, 1).toUpperCase()
             + in.substring(1).toLowerCase();
     }
+
+    public static String toCamelCase(String[] in) {
+        String[] out = new String[in.length];
+        for (int i = 0; i < in.length; i += 1) {
+            out[i] = toCamelCase(in[i]);
+        }
+        return String.join(" ", out);
+    }
 }

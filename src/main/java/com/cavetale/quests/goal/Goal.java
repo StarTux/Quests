@@ -47,6 +47,6 @@ public abstract class Goal {
     public String getDescription() {
         return description != null
             ? description
-            : "Finish it!";
+            : "Goal";
     }
 }

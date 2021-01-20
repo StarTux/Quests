@@ -4,7 +4,6 @@ import com.cavetale.quests.goal.ChatGoal;
 import com.cavetale.quests.goal.CommandGoal;
 import com.cavetale.quests.goal.GoalType;
 import com.cavetale.quests.util.Json;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 import org.junit.Test;
@@ -21,7 +20,8 @@ public final class QuestsTest {
         //
         ChatGoal chatGoal = (ChatGoal) GoalType.CHAT.newGoal();
         //
-        quest.setGoals(Arrays.asList(commandGoal, chatGoal));
+        quest.getGoals().add(commandGoal);
+        quest.getGoals().add(chatGoal);
 
         String json = Json.serialize(quest);
         System.out.println(json);

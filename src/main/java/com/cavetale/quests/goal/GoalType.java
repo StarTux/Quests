@@ -3,7 +3,8 @@ package com.cavetale.quests.goal;
 public enum GoalType {
     COMMAND(new CommandGoal.Holder()),
     CHAT(new ChatGoal.Holder()),
-    MINE_BLOCK(new MineBlockGoal.Holder());
+    MINE_BLOCK(new MineBlockGoal.Holder()),
+    BREED_ENTITY(new BreedEntityGoal.Holder());
 
     public final GoalHolder holder;
 

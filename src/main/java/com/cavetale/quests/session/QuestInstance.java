@@ -126,7 +126,6 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      */
     public void increaseAmount() {
         progress.increaseAmount();
-        session.getPlayer().sendMessage(progress.getAmount() + "/" + getCurrentGoal().getAmount());
         if (progress.getAmount() >= getCurrentGoal().getAmount()) {
             completeGoal();
         } else {

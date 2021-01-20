@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import lombok.Data;
 
 @Data
@@ -88,14 +89,14 @@ public final class Quest {
             : QuestCategory.DEFAULT;
     }
 
+    public void setCategory(QuestCategory category) {
+        tag.category = category;
+    }
+
     public int getIndex() {
         return tag != null
             ? tag.index
             : 0;
-    }
-
-    public void setCategory(QuestCategory category) {
-        tag.category = category;
     }
 
     public void setIndex(int index) {
@@ -104,5 +105,18 @@ public final class Quest {
 
     public String getTitle() {
         return tag.title != null ? tag.title : "Quest";
+    }
+
+    public void setTitle(String title) {
+        tag.title = title;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return tag.description;
+    }
+
+    public void setDescription(String description) {
+        tag.description = description;
     }
 }
