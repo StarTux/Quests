@@ -1,0 +1,38 @@
+main: com.cavetale.quests.QuestsPlugin
+
+name: Quests
+version: 0.1
+description: Quests Plugin
+api-version: 1.13
+
+author: StarTux
+website: https://github.com/StarTux/Quests
+
+depend: [SQL, Core, GenericEvents, Sidebar, Exploits]
+softdepend: []
+
+commands:
+
+  quests:
+    aliases: [quest, q]
+    description: Quests Command
+    permission: quests.quests
+    usage: |-
+      /quests
+
+  questsadmin:
+    aliases: [questsadmin, qadm]
+    description: Admin Command
+    permission: quests.admin
+    usage: |-
+      /questadmin
+
+permissions:
+
+  quests.quests:
+    description: Use /quests
+    default: op
+
+  quests.admin:
+    description: Use /questsadmin
+    default: op
