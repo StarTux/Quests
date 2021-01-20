@@ -3,6 +3,9 @@ package com.cavetale.quests;
 import com.cavetale.quests.util.Text;
 import net.md_5.bungee.api.ChatColor;
 
+/**
+ * Stored by ordinal in SQLQuest. Do not change the order!
+ */
 public enum QuestCategory {
     DEFAULT(ChatColor.DARK_GRAY),
     DEBUG(ChatColor.DARK_RED),

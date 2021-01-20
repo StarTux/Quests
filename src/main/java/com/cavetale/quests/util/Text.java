@@ -18,6 +18,10 @@ public final class Text {
         return new ClickEvent(ClickEvent.Action.RUN_COMMAND, cmd);
     }
 
+    public static ClickEvent bookmark(int pageIndex) {
+        return new ClickEvent(ClickEvent.Action.CHANGE_PAGE, "" + pageIndex);
+    }
+
     public static String colorize(String in) {
         return ChatColor.translateAlternateColorCodes('&', in);
     }

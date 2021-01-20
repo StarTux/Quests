@@ -40,19 +40,12 @@ public final class AdminCommand implements TabExecutor {
     boolean test(Player player, String[] args) {
         Quest quest = Quest.newInstance();
         quest.getTag().setCategory(QuestCategory.DEBUG);
-        quest.getTag().setTitle("The big testing quest!");
+        quest.getTag().setTitle("Testing");
         quest.getTag().setDescription("Learn the basics.");
         do {
             CommandGoal goal = (CommandGoal) GoalType.COMMAND.newGoal();
             goal.setCommand("rules");
             goal.setRegistered(true);
-            quest.getGoals().add(goal);
-        } while (false);
-        do {
-            MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
-            goal.setMaterial(Material.DIAMOND_ORE);
-            goal.setAmount(8);
-            goal.setNatural(true);
             quest.getGoals().add(goal);
         } while (false);
         quest.getReward().addItemStack(new ItemStack(Material.DIAMOND));
