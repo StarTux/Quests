@@ -5,6 +5,7 @@ import com.cavetale.quests.gui.Gui;
 import com.cavetale.quests.session.Sessions;
 import com.cavetale.quests.sql.Database;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,10 +26,13 @@ public final class QuestsPlugin extends JavaPlugin {
         for (GoalType goalType : GoalType.values()) {
             Listener listener = goalType.holder.getEventListener();
             if (listener != null) {
-                getServer().getPluginManager().registerEvents(listener, this);
+                Bukkit.getPluginManager().registerEvents(listener, this);
             }
         }
         sessions.enable();
+        if (Bukkit.getPluginManager().isPluginEnabled("Sidebar")) {
+            Bukkit.getPluginManager().registerEvents(new SidebarListener(this), this);
+        }
         Gui.enable(this);
     }
 

@@ -1,13 +1,10 @@
 package com.cavetale.quests.session;
 
 import com.cavetale.quests.QuestsPlugin;
-import com.cavetale.sidebar.PlayerSidebarEvent;
-import com.cavetale.sidebar.Priority;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,21 +56,6 @@ public final class Sessions implements Listener {
         Player player = event.getPlayer();
         Session session = sessions.remove(player.getUniqueId());
         if (session != null) session.disable();
-    }
-
-    @EventHandler
-    void onPlayerSidebar(PlayerSidebarEvent event) {
-        if (!(event.getPlayer().hasPermission("quests.quests"))) return;
-        Session session = of(event.getPlayer());
-        if (!session.isReady()) return;
-        int count = 0;
-        for (QuestInstance questInstance : session.getQuests()) {
-            if (questInstance.isReady() && !questInstance.getRow().isClaimed()) {
-                count += 1;
-            }
-        }
-        if (count == 0) return;
-        event.addLines(plugin, Priority.HIGH, ChatColor.AQUA + "You have a " + ChatColor.YELLOW + "/quest");
     }
 
     void tick() {
