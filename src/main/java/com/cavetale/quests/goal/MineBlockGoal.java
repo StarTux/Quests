@@ -68,12 +68,12 @@ public final class MineBlockGoal extends Goal {
 
         @Override
         public Quest newDailyQuest() {
-            Quest quest = Quest.newInstance();
-            quest.setCategory(QuestCategory.DAILY);
-            quest.setTitle("Apprentice Miner");
             Random random = ThreadLocalRandom.current();
             List<Material> list = getMaterials();
             Material material = list.get(random.nextInt(list.size()));
+            Quest quest = Quest.newInstance();
+            quest.setCategory(QuestCategory.DAILY);
+            quest.setTitle(Items.getName(material) + " Miner");
             MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
             goal.setMaterial(material);
             goal.setNatural(true);

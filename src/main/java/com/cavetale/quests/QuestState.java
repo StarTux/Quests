@@ -24,7 +24,6 @@ public final class QuestState {
 
     @Data
     public static final class Tag {
-        protected boolean accepted;
         protected int currentGoal;
     }
 

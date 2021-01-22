@@ -19,14 +19,21 @@ public final class QuestsCommand implements TabExecutor {
             .description("View your quests")
             .playerCaller(this::quests);
         rootNode.addChild("accept").denyTabCompletion()
+            .description("Accept quest")
             .hidden(true)
             .playerCaller(this::accept);
         rootNode.addChild("claim").denyTabCompletion()
+            .description("Claim quest rewards")
             .hidden(true)
             .playerCaller(this::claim);
         rootNode.addChild("view").denyTabCompletion()
+            .description("View quest")
             .hidden(true)
             .playerCaller(this::view);
+        rootNode.addChild("preview").denyTabCompletion()
+            .description("Preview quest rewards")
+            .hidden(true)
+            .playerCaller(this::preview);
         plugin.getCommand("quests").setExecutor(this);
     }
 
@@ -59,7 +66,7 @@ public final class QuestsCommand implements TabExecutor {
             return true;
         }
         QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
-        if (questInstance == null || questInstance.getState().getTag().isAccepted()) return true;
+        if (questInstance == null) return true;
         questInstance.playerAccept();
         plugin.sessions.of(player).getQuestBook().openBook(questInstance);
         return true;
@@ -83,8 +90,6 @@ public final class QuestsCommand implements TabExecutor {
         return true;
     }
 
-    /**
-     */
     boolean view(Player player, String[] args) {
         if (args.length != 1) return true;
         int questId;
@@ -95,6 +100,20 @@ public final class QuestsCommand implements TabExecutor {
         }
         QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
         plugin.sessions.of(player).getQuestBook().openBook(questInstance);
+        return true;
+    }
+
+    boolean preview(Player player, String[] args) {
+        if (args.length != 1) return true;
+        int questId;
+        try {
+            questId = Integer.parseInt(args[0]);
+        } catch (NumberFormatException nfe) {
+            return true;
+        }
+        QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
+        if (questInstance.getQuest().getReward().isEmpty()) return true;
+        questInstance.getQuest().getReward().showPreview(player, questInstance);
         return true;
     }
 }

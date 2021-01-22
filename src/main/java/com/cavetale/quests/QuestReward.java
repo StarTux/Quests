@@ -1,6 +1,7 @@
 package com.cavetale.quests;
 
 import com.cavetale.quests.gui.Gui;
+import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.util.Items;
 import com.winthier.generic_events.GenericEvents;
 import java.util.ArrayList;
@@ -90,6 +91,32 @@ public final class QuestReward {
         } else {
             postItems(player, quest);
         }
+    }
+
+    public boolean isEmpty() {
+        return money < 0.01 && (items == null || items.isEmpty());
+    }
+
+    public void showPreview(Player player, QuestInstance questInstance) {
+        List<ItemStack> itemStacks = getItemStacks();
+        if (money >= 0.01) {
+            ItemStack item = new ItemStack(Material.EMERALD);
+            Items.glow(item);
+            Items.setTooltip(item, ChatColor.GOLD + GenericEvents.formatMoney(money));
+            itemStacks.add(item);
+        }
+        int amount = itemStacks.size();
+        int rows = (amount - 1) / 9 + 1;
+        Gui gui = new Gui()
+            .title(questInstance.getQuest().getTitle())
+            .size(rows * 9);
+        for (int i = 0; i < itemStacks.size(); i += 1) {
+            gui.setItem(i, itemStacks.get(i));
+        }
+        gui.onClose(unused -> Bukkit.getScheduler().runTask(QuestsPlugin.getInst(), () -> {
+                    questInstance.getSession().getQuestBook().openBook(questInstance);
+                }));
+        gui.open(player);
     }
 
     void giveMoney(Player player, Quest quest) {

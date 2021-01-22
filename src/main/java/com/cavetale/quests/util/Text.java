@@ -38,4 +38,8 @@ public final class Text {
         }
         return String.join(" ", out);
     }
+
+    public static String toCamelCase(Enum en) {
+        return toCamelCase(en.name().split("_"));
+    }
 }

@@ -52,7 +52,7 @@ public final class QuestBook {
                     for (QuestInstance questInstance : list) {
                         Quest quest = questInstance.getQuest();
                         QuestState questState = questInstance.getState();
-                        if (!questState.getTag().isAccepted()) {
+                        if (!questInstance.getRow().isAccepted()) {
                             cb.append("\u2610").color(ChatColor.DARK_RED);
                             cb.event(Text.tooltip(ChatColor.GREEN + "Accept " + quest.getTitle()));
                             cb.event(Text.button("/quest accept " + questInstance.getRow().getId()));
@@ -69,6 +69,7 @@ public final class QuestBook {
                         }
                         cb.append(" ").reset();
                         cb.append(quest.getTitle());
+                        cb.color(questInstance.getRow().isComplete() ? ChatColor.BLUE : ChatColor.DARK_GRAY);
                         cb.event(Text.tooltip(quest.getTitle()));
                         clickMap.put(questInstance.getRow().getId(), cb.getCurrentComponent());
                         cb.append("\n").reset();
@@ -126,17 +127,16 @@ public final class QuestBook {
             cb.append("\n").reset();
             cb.append(quest.getTag().getDescription()).color(ChatColor.DARK_GRAY);
         }
-        QuestState questState = questInstance.getState();
-        if (questState.getTag().isAccepted() || quest.getGoals().size() == 1) {
+        if (questInstance.getRow().isAccepted() || quest.getGoals().size() == 1) {
             cb.append("\n\n").reset();
             Goal goal = questInstance.getCurrentGoal();
             cb.append(goal.getDescription()).color(ChatColor.DARK_GRAY);
             cb.append(" ").reset();
-            Progress progress = questState.getCurrentProgress();
+            Progress progress = questInstance.getState().getCurrentProgress();
             String progressString = Text.colorize(goal.getProgressString(progress));
             cb.append(progressString);
         }
-        if (!questState.getTag().isAccepted()) {
+        if (!questInstance.getRow().isAccepted()) {
             cb.append("\n\n").reset();
             cb.append("[Accept]").color(ChatColor.DARK_GREEN);
             cb.event(Text.tooltip(ChatColor.GREEN + "Accept this Quest"));
@@ -150,6 +150,13 @@ public final class QuestBook {
                 cb.event(Text.button("/quest claim " + questInstance.getRow().getId()));
             } else {
                 cb.append("Complete").color(ChatColor.BLUE).bold(true);
+            }
+        } else {
+            if (!quest.getReward().isEmpty()) {
+                cb.append(" ").reset();
+                cb.append("[Preview]").color(ChatColor.GOLD);
+                cb.event(Text.tooltip(ChatColor.GOLD + "Preview the rewards"));
+                cb.event(Text.button("/quest preview " + questInstance.getRow().getId()));
             }
         }
         return cb;

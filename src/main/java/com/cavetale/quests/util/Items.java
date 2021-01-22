@@ -1,10 +1,14 @@
 package com.cavetale.quests.util;
 
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public final class Items {
     private Items() { }
@@ -25,5 +29,22 @@ public final class Items {
         return material.isItem()
             ? new ItemStack(material).getI18NDisplayName()
             : Stream.of(material.name().split("_")).map(Text::toCamelCase).collect(Collectors.joining(" "));
+    }
+
+    public static void setTooltip(ItemStack itemStack, String tooltip) {
+        ItemMeta meta = itemStack.getItemMeta();
+        String[] toks = tooltip.split("\n");
+        meta.setDisplayName(toks[0]);
+        toks = Arrays.copyOfRange(toks, 1, toks.length);
+        meta.setLore(Arrays.asList(toks));
+        meta.addItemFlags(ItemFlag.values());
+        itemStack.setItemMeta(meta);
+    }
+
+    public static void glow(ItemStack itemStack) {
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.addEnchant(Enchantment.DURABILITY, 1, true);
+        meta.addItemFlags(ItemFlag.values());
+        itemStack.setItemMeta(meta);
     }
 }

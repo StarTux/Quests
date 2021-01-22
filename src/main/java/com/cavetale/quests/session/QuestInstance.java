@@ -113,7 +113,7 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      * Return true if this quest is ready to make state and save.
      */
     public boolean isActive() {
-        return isReady() && state.getTag().isAccepted() && !row.isComplete();
+        return isReady() && row.isAccepted() && !row.isComplete();
     }
 
     /**
@@ -200,6 +200,16 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     }
 
     /**
+     * Update the accepted status of the sql row.
+     */
+    public boolean setAccepted() {
+        if (row.isAccepted()) return false;
+        row.setAccepted(true);
+        session.getPlugin().getDatabase().getDb().saveAsync(row, null, "accepted");
+        return true;
+    }
+
+    /**
      * Update the completion status of the sql row.
      */
     public boolean setComplete() {
@@ -243,9 +253,7 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      * Player accepts this quest.
      */
     public boolean playerAccept() {
-        if (state.getTag().isAccepted()) return false;
-        state.getTag().setAccepted(true);
-        saveStateToDatabase();
+        if (!setAccepted()) return false;
         progressBar.showProgress();
         session.getPlayer().playSound(session.getPlayer().getLocation(),
                                       Sound.ENTITY_PLAYER_LEVELUP,

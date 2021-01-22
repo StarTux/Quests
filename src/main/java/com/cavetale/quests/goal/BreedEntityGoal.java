@@ -56,12 +56,12 @@ public final class BreedEntityGoal extends Goal {
 
         @Override
         public Quest newDailyQuest() {
-            Quest quest = Quest.newInstance();
-            quest.setCategory(QuestCategory.DAILY);
-            quest.setTitle("Ranch Assistant");
             Random random = ThreadLocalRandom.current();
             List<EntityType> list = getEntityTypes();
             EntityType entityType = list.get(random.nextInt(list.size()));
+            Quest quest = Quest.newInstance();
+            quest.setCategory(QuestCategory.DAILY);
+            quest.setTitle(Text.toCamelCase(entityType) + " Rancher");
             BreedEntityGoal goal = (BreedEntityGoal) GoalType.BREED_ENTITY.newGoal();
             goal.setEntityType(entityType);
             goal.setAmount(1);
