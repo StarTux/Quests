@@ -1,8 +1,7 @@
 package com.cavetale.quests.sql;
 
 import com.cavetale.quests.Quest;
-import com.cavetale.quests.QuestCategory;
-import com.cavetale.quests.goal.Progress;
+import com.cavetale.quests.QuestState;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -20,22 +19,27 @@ public final class SQLQuest {
     @Column(nullable = false)
     private UUID player;
     @Column(nullable = false, length = 255)
-    private QuestCategory category;
+    private String category;
     @Column(nullable = false)
     private int index;
     @Column(nullable = false, length = 4096)
     private String quest;
     @Column(nullable = false, length = 4096)
-    private String progress;
+    private String state;
+    @Column(nullable = false)
+    private boolean complete;
     @Column(nullable = false)
     private boolean claimed;
     @Column(nullable = false)
     private Date created;
 
-    public void store(final Quest theQuest, final Progress theProgress) {
+    public void store(final Quest theQuest) {
         this.quest = theQuest.serialize();
-        this.category = theQuest.getCategory();
+        this.category = theQuest.getCategory().key;
         this.index = theQuest.getIndex();
-        this.progress = theProgress.serialize();
+    }
+
+    public void store(final QuestState theState) {
+        this.state = theState.serialize();
     }
 }

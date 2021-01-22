@@ -59,7 +59,7 @@ public final class QuestsCommand implements TabExecutor {
             return true;
         }
         QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
-        if (questInstance == null || questInstance.getProgress().isAccepted()) return true;
+        if (questInstance == null || questInstance.getState().getTag().isAccepted()) return true;
         questInstance.playerAccept();
         plugin.sessions.of(player).getQuestBook().openBook(questInstance);
         return true;

@@ -7,10 +7,12 @@ import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.session.Session;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @RequiredArgsConstructor
 public final class AdminCommand implements TabExecutor {
@@ -71,9 +73,11 @@ public final class AdminCommand implements TabExecutor {
             RegularGoalHolder holder = (RegularGoalHolder) goalType.holder;
             Quest dailyQuest = holder.newDailyQuest();
             dailyQuest.getReward().setMoney(100.0);
+            dailyQuest.getReward().addItemStack(new ItemStack(Material.DIAMOND));
             session.addNewQuest(dailyQuest);
             Quest weeklyQuest = holder.newWeeklyQuest();
             weeklyQuest.getReward().setMoney(1000.0);
+            weeklyQuest.getReward().addItemStack(new ItemStack(Material.GOLDEN_APPLE));
             session.addNewQuest(weeklyQuest);
         }
     }

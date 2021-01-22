@@ -6,8 +6,6 @@ import com.cavetale.quests.util.Json;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -17,7 +15,6 @@ import lombok.Data;
 public final class Quest {
     private Tag tag;
     private List<Goal> goals;
-    private QuestReward reward;
 
     public Quest() { }
 
@@ -27,6 +24,7 @@ public final class Quest {
         private int index;
         private String title;
         private String description;
+        private QuestReward reward;
         /**
          * Optional; Keys of comleted keyed quests are saved in the
          * player's completed quests storage.
@@ -36,9 +34,9 @@ public final class Quest {
 
     public static Quest newInstance() {
         Quest quest = new Quest();
-        quest.tag = new Quest.Tag();
+        quest.tag = new Tag();
+        quest.tag.reward = new QuestReward();
         quest.goals = new ArrayList<>();
-        quest.reward = new QuestReward();
         return quest;
     }
 
@@ -51,7 +49,7 @@ public final class Quest {
      *
      * @throws RuntimeException if something goes wrong.
      */
-    public static Quest deserialize(Reader in) {
+    public static Quest deserialize(String in) {
         Quest quest = Quest.newInstance();
         quest.setGoals(new ArrayList<>());
         JsonElement elem = Json.PARSER.parse(in);
@@ -67,16 +65,11 @@ public final class Quest {
         }
         // tag
         if (!root.has("tag")) {
-            quest.tag = new Quest.Tag();
+            quest.tag = new Tag();
         } else {
             quest.tag = Json.GSON.fromJson(root.get("tag"), Quest.Tag.class);
         }
         return quest;
-    }
-
-    public static Quest deserialize(String in) {
-        Reader reader = new StringReader(in);
-        return deserialize(reader);
     }
 
     public Quest clone() {
@@ -118,5 +111,9 @@ public final class Quest {
 
     public void setDescription(String description) {
         tag.description = description;
+    }
+
+    public QuestReward getReward() {
+        return tag.reward;
     }
 }

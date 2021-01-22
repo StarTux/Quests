@@ -2,6 +2,8 @@ package com.cavetale.quests.session;
 
 import com.cavetale.quests.Quest;
 import com.cavetale.quests.QuestCategory;
+import com.cavetale.quests.QuestState;
+import com.cavetale.quests.goal.Goal;
 import com.cavetale.quests.goal.Progress;
 import com.cavetale.quests.util.Text;
 import java.util.ArrayList;
@@ -49,12 +51,12 @@ public final class QuestBook {
                     cb.append("\n").reset();
                     for (QuestInstance questInstance : list) {
                         Quest quest = questInstance.getQuest();
-                        Progress progress = questInstance.getProgress();
-                        if (!progress.isAccepted()) {
+                        QuestState questState = questInstance.getState();
+                        if (!questState.getTag().isAccepted()) {
                             cb.append("\u2610").color(ChatColor.DARK_RED);
                             cb.event(Text.tooltip(ChatColor.GREEN + "Accept " + quest.getTitle()));
                             cb.event(Text.button("/quest accept " + questInstance.getRow().getId()));
-                        } else if (!progress.isCompleted()) {
+                        } else if (!questInstance.getRow().isComplete()) {
                             cb.append("\u2610").color(ChatColor.DARK_GREEN);
                             cb.event(Text.tooltip(ChatColor.RED + "Not completed"));
                         } else if (!questInstance.getRow().isClaimed()) {
@@ -124,21 +126,23 @@ public final class QuestBook {
             cb.append("\n").reset();
             cb.append(quest.getTag().getDescription()).color(ChatColor.DARK_GRAY);
         }
-        Progress progress = questInstance.getProgress();
-        if (progress.isAccepted() || quest.getGoals().size() == 1) {
+        QuestState questState = questInstance.getState();
+        if (questState.getTag().isAccepted() || quest.getGoals().size() == 1) {
             cb.append("\n\n").reset();
-            cb.append(questInstance.getCurrentGoal().getDescription()).color(ChatColor.DARK_GRAY);
+            Goal goal = questInstance.getCurrentGoal();
+            cb.append(goal.getDescription()).color(ChatColor.DARK_GRAY);
             cb.append(" ").reset();
-            String progressString = Text.colorize(questInstance.getCurrentGoal().getProgressString(progress));
+            Progress progress = questState.getCurrentProgress();
+            String progressString = Text.colorize(goal.getProgressString(progress));
             cb.append(progressString);
         }
-        if (!progress.isAccepted()) {
+        if (!questState.getTag().isAccepted()) {
             cb.append("\n\n").reset();
             cb.append("[Accept]").color(ChatColor.DARK_GREEN);
             cb.event(Text.tooltip(ChatColor.GREEN + "Accept this Quest"));
             cb.event(Text.button("/quest accept " + questInstance.getRow().getId()));
         }
-        if (progress.isCompleted()) {
+        if (questInstance.getRow().isComplete()) {
             cb.append("\n\n").reset();
             if (!questInstance.getRow().isClaimed()) {
                 cb.append("[Claim]").color(ChatColor.GOLD).bold(true);

@@ -1,6 +1,7 @@
 package com.cavetale.quests.session;
 
 import com.cavetale.quests.Quest;
+import com.cavetale.quests.QuestState;
 import com.cavetale.quests.goal.Goal;
 import com.cavetale.quests.goal.Progress;
 import com.cavetale.quests.sql.SQLQuest;
@@ -28,15 +29,18 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     private final Session session;
     private final SQLQuest row;
     private final Quest quest;
-    private Progress progress;
+    private final QuestState state;
     private boolean enabled;
     private ProgressBar progressBar = new ProgressBar(this);
 
+    /**
+     * Constructor with an existing sql row.
+     */
     public QuestInstance(final Session session, final SQLQuest row) {
         this.session = session;
         this.row = row;
         this.quest = Quest.deserialize(row.getQuest()); // throws
-        this.progress = Progress.deserialize(row.getProgress(), quest);
+        this.state = QuestState.deserialize(row.getState(), quest);
     }
 
     /**
@@ -45,12 +49,19 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     public QuestInstance(final Session session, final Quest quest) {
         this.session = session;
         this.quest = quest;
-        this.progress = quest.getGoals().get(0).getHolder().newProgress();
+        this.state = new QuestState();
+        this.state.prepare(quest);
         this.row = new SQLQuest();
     }
 
     public Goal getCurrentGoal() {
-        return quest.getGoals().get(progress.getGoalIndex());
+        int index = state.getTag().getCurrentGoal();
+        return quest.getGoals().get(index);
+    }
+
+    public Progress getCurrentProgress() {
+        int index = state.getTag().getCurrentGoal();
+        return state.getGoals().get(index);
     }
 
     @Override
@@ -67,19 +78,20 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     public boolean insertIntoDatabase() {
         if (row.getId() != null) return false;
         row.setPlayer(session.getPlayer().getUniqueId());
-        row.store(quest, progress);
+        row.store(quest);
+        row.store(state);
         row.setCreated(new Date());
         session.getPlugin().getDatabase().getDb().insertAsync(row, null);
         return true;
     }
 
-    public boolean saveToDatabase() {
+    public boolean saveStateToDatabase() {
         if (row.getId() == null) return false;
-        row.store(quest, progress);
+        row.store(state);
         if (session.getPlugin().isEnabled()) {
-            session.getPlugin().getDatabase().getDb().saveAsync(row, null);
+            session.getPlugin().getDatabase().getDb().updateAsync(row, null, "state");
         } else {
-            session.getPlugin().getDatabase().getDb().save(row);
+            session.getPlugin().getDatabase().getDb().update(row, "state");
         }
         return true;
     }
@@ -98,10 +110,10 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     }
 
     /**
-     * Return true if this quest is ready to make progress and save.
+     * Return true if this quest is ready to make state and save.
      */
     public boolean isActive() {
-        return isReady() && progress.isAccepted() && !progress.isCompleted();
+        return isReady() && state.getTag().isAccepted() && !row.isComplete();
     }
 
     /**
@@ -120,11 +132,12 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     }
 
     /**
-     * Increase the amount within Progress. If the amount within the
+     * Increase the amount within state. If the amount within the
      * current Goal is reached, trigger the completion of the current
      * goal.
      */
     public void increaseAmount() {
+        Progress progress = getCurrentProgress();
         progress.increaseAmount();
         if (progress.getAmount() >= getCurrentGoal().getAmount()) {
             completeGoal();
@@ -135,19 +148,18 @@ public final class QuestInstance implements Comparable<QuestInstance> {
                                           0.5f, 0.5f);
         }
         progressBar.showProgress();
+        saveStateToDatabase();
     }
 
     /**
      * Move on to the next goal or mark the current quest as completed.
      */
     public void completeGoal() {
-        int goalIndex = progress.getGoalIndex() + 1;
-        if (goalIndex < quest.getGoals().size()) {
+        Progress progress = getCurrentProgress();
+        int newGoalIndex = state.getTag().getCurrentGoal() + 1;
+        if (newGoalIndex < quest.getGoals().size()) {
             // Next goal
-            Goal newGoal = quest.getGoals().get(goalIndex);
-            progress = newGoal.getHolder().newProgress();
-            progress.setGoalIndex(goalIndex);
-            progress.setAccepted(true);
+            state.getTag().setCurrentGoal(newGoalIndex);
             session.getPlayer().sendMessage("Goal complete!");
             progressBar.onNewGoal();
             session.getPlayer().playSound(session.getPlayer().getLocation(),
@@ -155,14 +167,13 @@ public final class QuestInstance implements Comparable<QuestInstance> {
                                           SoundCategory.MASTER,
                                           0.5f, 2.0f);
         } else {
-            progress.setCompleted(true);
+            setComplete();
             session.getPlayer().sendTitle(new Title("", ChatColor.GOLD + "Quest complete"));
             session.getPlayer().playSound(session.getPlayer().getLocation(),
                                           Sound.UI_TOAST_CHALLENGE_COMPLETE,
                                           SoundCategory.MASTER,
                                           0.1f, 2.0f);
         }
-        saveToDatabase();
     }
 
     void tick() {
@@ -189,10 +200,21 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     }
 
     /**
+     * Update the completion status of the sql row.
+     */
+    public boolean setComplete() {
+        if (row.isComplete()) return false;
+        row.setComplete(true);
+        session.getPlugin().getDatabase().getDb().saveAsync(row, null, "complete");
+        return true;
+    }
+
+    /**
      * Called via command button. Maybe gui.
      */
     public boolean playerClaim() {
         if (row.isClaimed()) return false;
+        row.setClaimed(true);
         String sql = "UPDATE `"
             + session.getPlugin().getDatabase().getDb().getTable(SQLQuest.class).getTableName()
             + "` SET `claimed` = 1"
@@ -210,10 +232,10 @@ public final class QuestInstance implements Comparable<QuestInstance> {
             session.getPlugin().getLogger()
                 .warning("Claiming quest interrupted: Session disabled: "
                          + session.getPlayer().getName() + ", " + rowCount);
-            saveToDatabase();
+            row.setClaimed(false);
+            session.getPlugin().getDatabase().getDb().update(row, null, "claimed");
             return;
         }
-        row.setClaimed(true);
         quest.getReward().givePlayer(session.getPlayer(), quest);
     }
 
@@ -221,9 +243,9 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      * Player accepts this quest.
      */
     public boolean playerAccept() {
-        if (progress.isAccepted()) return false;
-        progress.setAccepted(true);
-        saveToDatabase();
+        if (state.getTag().isAccepted()) return false;
+        state.getTag().setAccepted(true);
+        saveStateToDatabase();
         progressBar.showProgress();
         session.getPlayer().playSound(session.getPlayer().getLocation(),
                                       Sound.ENTITY_PLAYER_LEVELUP,

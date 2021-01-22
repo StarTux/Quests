@@ -80,7 +80,7 @@ public final class BreedEntityGoal extends Goal {
             List<EntityType> list = getEntityTypes();
             Collections.shuffle(list, random);
             for (int i = 0; i < amount; i += 1) {
-                EntityType entityType = list.get(0);
+                EntityType entityType = list.get(i);
                 BreedEntityGoal goal = (BreedEntityGoal) GoalType.BREED_ENTITY.newGoal();
                 goal.setEntityType(entityType);
                 goal.setAmount(1);

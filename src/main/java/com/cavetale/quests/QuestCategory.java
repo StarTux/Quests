@@ -15,10 +15,12 @@ public enum QuestCategory {
     STORY(ChatColor.DARK_AQUA);
 
     public final ChatColor color;
+    public final String key;
     public final String humanName;
 
     QuestCategory(final ChatColor color) {
         this.color = color;
+        this.key = name().toLowerCase();
         this.humanName = Text.toCamelCase(name());
     }
 }
