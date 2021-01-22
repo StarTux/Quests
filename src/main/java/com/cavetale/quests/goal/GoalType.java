@@ -4,7 +4,8 @@ public enum GoalType {
     COMMAND(new CommandGoal.Holder()),
     CHAT(new ChatGoal.Holder()),
     MINE_BLOCK(new MineBlockGoal.Holder()),
-    BREED_ENTITY(new BreedEntityGoal.Holder());
+    BREED_ENTITY(new BreedEntityGoal.Holder()),
+    EAT(new EatGoal.Holder());
 
     public final GoalHolder holder;
 

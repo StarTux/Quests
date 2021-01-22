@@ -4,12 +4,9 @@ import com.cavetale.quests.Quest;
 import com.cavetale.quests.QuestCategory;
 import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.util.Items;
-import com.destroystokyo.paper.MaterialTags;
-import com.winthier.exploits.Exploits;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.Data;
@@ -20,37 +17,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.inventory.ItemStack;
 
 @Data @EqualsAndHashCode(callSuper = true)
-public final class MineBlockGoal extends Goal {
+public final class EatGoal extends Goal {
     private Material material;
-    private String blockData;
-    private boolean natural;
 
     @Override
     public String getDescription() {
         return description != null
             ? description
-            : "Mine " + (natural ? "natural " : "") + Items.getName(material);
+            : "Eat " + Items.getName(material);
     }
 
-    public boolean onBlockBreak(QuestInstance questInstance, BlockBreakEvent event) {
-        if (material != event.getBlock().getType()) return false;
-        if (blockData != null) {
-            String string = event.getBlock().getBlockData().getAsString();
-            if (!Objects.equals(string, blockData)) return false;
-        }
-        if (natural) {
-            if (Exploits.isPlayerPlaced(event.getBlock())) return false;
-        }
+    public boolean onEat(QuestInstance questInstance, ItemStack itemStack) {
+        if (material != itemStack.getType()) return false;
         questInstance.increaseAmount();
         return true;
     }
 
     @Getter
     public static final class Holder implements RegularGoalHolder {
-        private final Class<? extends Goal> goalClass = MineBlockGoal.class;
+        private final Class<? extends Goal> goalClass = EatGoal.class;
         private final Listener eventListener = new EventListener();
         List<Material> materials;
 
@@ -58,7 +47,7 @@ public final class MineBlockGoal extends Goal {
             if (materials == null) {
                 materials = new ArrayList<>();
                 for (Material material : Material.values()) {
-                    if (MaterialTags.ORES.isTagged(material)) {
+                    if (material.isEdible()) {
                         materials.add(material);
                     }
                 }
@@ -72,16 +61,12 @@ public final class MineBlockGoal extends Goal {
             List<Material> list = getMaterials();
             Material material = list.get(random.nextInt(list.size()));
             String materialName = Items.getName(material);
-            if (materialName.endsWith(" Ore")) {
-                materialName = materialName.substring(0, materialName.length() - 4);
-            }
             Quest quest = Quest.newInstance();
             quest.setCategory(QuestCategory.DAILY);
-            quest.setTitle(materialName + " Miner");
-            MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
+            quest.setTitle(materialName + " Eater");
+            EatGoal goal = (EatGoal) GoalType.EAT.newGoal();
             goal.setMaterial(material);
-            goal.setNatural(true);
-            goal.setAmount(4 + 4 * random.nextInt(4));
+            goal.setAmount(3 + 3 * random.nextInt(3));
             quest.getGoals().add(goal);
             return quest;
         }
@@ -90,18 +75,17 @@ public final class MineBlockGoal extends Goal {
         public Quest newWeeklyQuest() {
             Quest quest = Quest.newInstance();
             quest.setCategory(QuestCategory.WEEKLY);
-            quest.setTitle("Master Miner");
-            int amount = 5;
-            quest.setDescription("Mine " + amount + " different ores");
+            quest.setTitle("Professional Eater");
+            int amount = 7;
+            quest.setDescription("Eat " + amount + " different foods");
             Random random = ThreadLocalRandom.current();
             List<Material> list = getMaterials();
             Collections.shuffle(list, random);
             for (int i = 0; i < amount; i += 1) {
                 Material material = list.get(i);
-                MineBlockGoal goal = (MineBlockGoal) GoalType.MINE_BLOCK.newGoal();
+                EatGoal goal = (EatGoal) GoalType.EAT.newGoal();
                 goal.setMaterial(material);
-                goal.setNatural(true);
-                goal.setAmount(4 + 4 * random.nextInt(4));
+                goal.setAmount(1);
                 quest.getGoals().add(goal);
             }
             return quest;
@@ -109,13 +93,12 @@ public final class MineBlockGoal extends Goal {
     }
 
     public static final class EventListener implements Listener {
-        // MONITOR would break Exploits
-        @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-        void onBlockBreak(BlockBreakEvent event) {
+        @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+        void onPlayerItemConsume(PlayerItemConsumeEvent event) {
             Player player = (Player) event.getPlayer();
-            for (QuestInstance questInstance : QuestInstance.of(player, MineBlockGoal.class)) {
-                MineBlockGoal goal = (MineBlockGoal) questInstance.getCurrentGoal();
-                goal.onBlockBreak(questInstance, event);
+            for (QuestInstance questInstance : QuestInstance.of(player, EatGoal.class)) {
+                EatGoal goal = (EatGoal) questInstance.getCurrentGoal();
+                goal.onEat(questInstance, event.getItem());
             }
         }
     }
