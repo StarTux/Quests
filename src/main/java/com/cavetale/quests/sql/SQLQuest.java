@@ -27,6 +27,10 @@ public final class SQLQuest {
     @Column(nullable = false, length = 4096)
     private String state;
     @Column(nullable = false)
+    private boolean seen;
+    @Column(nullable = false)
+    private boolean focus;
+    @Column(nullable = false)
     private boolean accepted;
     @Column(nullable = false)
     private boolean complete;

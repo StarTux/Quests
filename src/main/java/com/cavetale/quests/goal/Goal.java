@@ -1,5 +1,6 @@
 package com.cavetale.quests.goal;
 
+import com.cavetale.quests.util.Text;
 import lombok.Data;
 
 /**
@@ -29,13 +30,7 @@ public abstract class Goal {
      * progress. Defaults to "<amount>/<required>".
      */
     public String getProgressString(Progress progress) {
-        return amount > 1
-            ? (progress.getAmount() >= amount
-               ? "&9" + progress.getAmount() + "/" + Math.max(1, amount)
-               : "&1" + progress.getAmount() + "&8/&1" + Math.max(1, amount))
-            : (progress.getAmount() == 0
-               ? "&4\u2610"
-               : "&2\u2611");
+        return Text.getProgressString(progress.getAmount(), amount);
     }
 
     /**

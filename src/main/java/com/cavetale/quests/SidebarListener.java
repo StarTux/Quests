@@ -2,6 +2,7 @@ package com.cavetale.quests;
 
 import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.session.Session;
+import com.cavetale.quests.util.Text;
 import com.cavetale.sidebar.PlayerSidebarEvent;
 import com.cavetale.sidebar.Priority;
 import lombok.RequiredArgsConstructor;
@@ -18,22 +19,29 @@ public final class SidebarListener implements Listener {
         if (!(event.getPlayer().hasPermission("quests.quests"))) return;
         Session session = plugin.sessions.of(event.getPlayer());
         if (!session.isReady()) return;
-        int notAccepted = 0;
+        int notSeen = 0;
         int notClaimed = 0;
+        QuestInstance focus = null;
         for (QuestInstance questInstance : session.getQuests()) {
             if (questInstance.isReady() && !questInstance.getRow().isClaimed()) {
-                if (!questInstance.getRow().isAccepted()) {
-                    notAccepted += 1;
+                if (!questInstance.getRow().isSeen()) {
+                    notSeen += 1;
                 }
                 if (questInstance.getRow().isComplete() && !questInstance.getRow().isClaimed()) {
                     notClaimed += 1;
                 }
+                if (!questInstance.getRow().isComplete() && questInstance.getRow().isAccepted() && questInstance.getRow().isFocus()) {
+                    focus = questInstance;
+                }
             }
         }
-        if (notClaimed > 0) {
+        if (focus != null) {
+            String longLine =  ChatColor.GOLD + "Quest: " + ChatColor.GRAY + focus.getCurrentGoal().getDescription();
+            event.addLines(plugin, Priority.DEFAULT, Text.wrapLine(longLine, 18));
+        } else if (notClaimed > 0) {
             event.addLines(plugin, Priority.HIGH, ChatColor.GOLD + "You have a " + ChatColor.WHITE + "/quest" + ChatColor.GOLD + " reward");
-        } else if (notAccepted > 0) {
-            event.addLines(plugin, Priority.HIGH, ChatColor.AQUA + "You have a " + ChatColor.YELLOW + "/quest");
+        } else if (notSeen > 0) {
+            event.addLines(plugin, Priority.HIGH, ChatColor.AQUA + "You have a new " + ChatColor.YELLOW + "/quest");
         }
     }
 }

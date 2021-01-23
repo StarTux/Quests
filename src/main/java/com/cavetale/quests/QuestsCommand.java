@@ -34,6 +34,14 @@ public final class QuestsCommand implements TabExecutor {
             .description("Preview quest rewards")
             .hidden(true)
             .playerCaller(this::preview);
+        rootNode.addChild("focus").denyTabCompletion()
+            .description("Focus a quest")
+            .hidden(true)
+            .playerCaller(this::focus);
+        rootNode.addChild("unfocus").denyTabCompletion()
+            .description("Unfocus all quests")
+            .hidden(true)
+            .playerCaller(this::unfocus);
         plugin.getCommand("quests").setExecutor(this);
     }
 
@@ -99,6 +107,7 @@ public final class QuestsCommand implements TabExecutor {
             return true;
         }
         QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
+        if (questInstance == null) return true;
         plugin.sessions.of(player).getQuestBook().openBook(questInstance);
         return true;
     }
@@ -112,8 +121,34 @@ public final class QuestsCommand implements TabExecutor {
             return true;
         }
         QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
+        if (questInstance == null) return true;
         if (questInstance.getQuest().getReward().isEmpty()) return true;
         questInstance.getQuest().getReward().showPreview(player, questInstance);
+        return true;
+    }
+
+    boolean focus(Player player, String[] args) {
+        if (args.length != 1) return true;
+        int questId;
+        try {
+            questId = Integer.parseInt(args[0]);
+        } catch (NumberFormatException nfe) {
+            return true;
+        }
+        QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
+        if (questInstance == null) return true;
+        for (QuestInstance otherInstance : plugin.sessions.of(player).getQuests()) {
+            otherInstance.setFocus(questInstance == otherInstance);
+        }
+        plugin.sessions.of(player).getQuestBook().openBook(questInstance);
+        return true;
+    }
+
+    boolean unfocus(Player player, String[] args) {
+        if (args.length != 0) return true;
+        for (QuestInstance otherInstance : plugin.sessions.of(player).getQuests()) {
+            otherInstance.setFocus(false);
+        }
         return true;
     }
 }

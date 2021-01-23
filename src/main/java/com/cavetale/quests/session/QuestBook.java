@@ -5,6 +5,7 @@ import com.cavetale.quests.QuestCategory;
 import com.cavetale.quests.QuestState;
 import com.cavetale.quests.goal.Goal;
 import com.cavetale.quests.goal.Progress;
+import com.cavetale.quests.sql.SQLQuest;
 import com.cavetale.quests.util.Text;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +30,8 @@ public final class QuestBook {
      * Open a book containing all quests, including overview.
      */
     public void openBook() {
+        final List<QuestInstance> quests = session.getVisibleQuests();
         ItemStack bookStack = makeBook(meta -> {
-                List<QuestInstance> quests = session.getVisibleQuests();
                 Collections.sort(quests);
                 if (quests.isEmpty()) {
                     meta.addPage(ChatColor.RED + "No quests to show");
@@ -53,7 +54,7 @@ public final class QuestBook {
                         Quest quest = questInstance.getQuest();
                         QuestState questState = questInstance.getState();
                         if (!questInstance.getRow().isAccepted()) {
-                            cb.append("\u2610").color(ChatColor.DARK_RED);
+                            cb.append("\u2610").color(ChatColor.GRAY);
                             cb.event(Text.tooltip(ChatColor.GREEN + "Accept " + quest.getTitle()));
                             cb.event(Text.button("/quest accept " + questInstance.getRow().getId()));
                         } else if (!questInstance.getRow().isComplete()) {
@@ -89,6 +90,9 @@ public final class QuestBook {
                 meta.spigot().setPage(1, cb.create());
             });
         session.getPlayer().openBook(bookStack);
+        for (QuestInstance questInstance : quests) {
+            questInstance.setSeen(true);
+        }
     }
 
     /**
@@ -104,6 +108,7 @@ public final class QuestBook {
                 meta.spigot().addPage(cb.create());
             });
         session.getPlayer().openBook(bookStack);
+        questInstance.setSeen(true);
     }
 
     private ItemStack makeBook(Consumer<BookMeta> callback) {
@@ -121,13 +126,20 @@ public final class QuestBook {
         Quest quest = questInstance.getQuest();
         ComponentBuilder cb = new ComponentBuilder();
         QuestCategory category = quest.getCategory();
+        SQLQuest row = questInstance.getRow();
         cb.append(Text.colorize(String.join("&r ", "" + category.color + ChatColor.BOLD + category.humanName,
                                             quest.getTitle())));
         if (quest.getTag().getDescription() != null) {
             cb.append("\n").reset();
             cb.append(quest.getTag().getDescription()).color(ChatColor.DARK_GRAY);
+            if (quest.getGoals().size() > 1) {
+                cb.append(" ").reset();
+                String prog = Text.getProgressString(questInstance.getState().getTag().getCurrentGoal() + 1,
+                                                     quest.getGoals().size());
+                cb.append(Text.colorize(prog));
+            }
         }
-        if (questInstance.getRow().isAccepted() || quest.getGoals().size() == 1) {
+        if (row.isAccepted() || quest.getGoals().size() == 1) {
             cb.append("\n\n").reset();
             Goal goal = questInstance.getCurrentGoal();
             cb.append(goal.getDescription()).color(ChatColor.DARK_GRAY);
@@ -136,18 +148,18 @@ public final class QuestBook {
             String progressString = Text.colorize(goal.getProgressString(progress));
             cb.append(progressString);
         }
-        if (!questInstance.getRow().isAccepted()) {
+        if (!row.isAccepted()) {
             cb.append("\n\n").reset();
             cb.append("[Accept]").color(ChatColor.DARK_GREEN);
             cb.event(Text.tooltip(ChatColor.GREEN + "Accept this Quest"));
-            cb.event(Text.button("/quest accept " + questInstance.getRow().getId()));
+            cb.event(Text.button("/quest accept " + row.getId()));
         }
-        if (questInstance.getRow().isComplete()) {
+        if (row.isComplete()) {
             cb.append("\n\n").reset();
-            if (!questInstance.getRow().isClaimed()) {
+            if (!row.isClaimed()) {
                 cb.append("[Claim]").color(ChatColor.GOLD).bold(true);
                 cb.event(Text.tooltip(ChatColor.GOLD + "Claim the rewards"));
-                cb.event(Text.button("/quest claim " + questInstance.getRow().getId()));
+                cb.event(Text.button("/quest claim " + row.getId()));
             } else {
                 cb.append("Complete").color(ChatColor.BLUE).bold(true);
             }
@@ -156,7 +168,19 @@ public final class QuestBook {
                 cb.append(" ").reset();
                 cb.append("[Preview]").color(ChatColor.GOLD);
                 cb.event(Text.tooltip(ChatColor.GOLD + "Preview the rewards"));
-                cb.event(Text.button("/quest preview " + questInstance.getRow().getId()));
+                cb.event(Text.button("/quest preview " + row.getId()));
+            }
+        }
+        if (row.isAccepted() && !row.isComplete()) {
+            cb.append(" ").reset();
+            if (row.isFocus()) {
+                cb.append("[Unfocus]").color(ChatColor.DARK_GRAY);
+                cb.event(Text.tooltip(ChatColor.BLUE + "Stop focussing this quest"));
+                cb.event(Text.button("/quest unfocus"));
+            } else {
+                cb.append("[Focus]").color(ChatColor.BLUE);
+                cb.event(Text.tooltip(ChatColor.BLUE + "Focus this quest"));
+                cb.event(Text.button("/quest focus " + row.getId()));
             }
         }
         return cb;

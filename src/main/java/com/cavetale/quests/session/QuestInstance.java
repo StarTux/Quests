@@ -199,6 +199,20 @@ public final class QuestInstance implements Comparable<QuestInstance> {
         progressBar.disable();
     }
 
+    public boolean setSeen(boolean seen) {
+        if (row.isSeen() == seen) return false;
+        row.setSeen(seen);
+        session.getPlugin().getDatabase().getDb().updateAsync(row, null, "seen");
+        return true;
+    }
+
+    public boolean setFocus(boolean focus) {
+        if (row.isFocus() == focus) return false;
+        row.setFocus(focus);
+        session.getPlugin().getDatabase().getDb().updateAsync(row, null, "focus");
+        return true;
+    }
+
     /**
      * Update the accepted status of the sql row.
      */

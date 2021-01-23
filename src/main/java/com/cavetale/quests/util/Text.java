@@ -1,5 +1,7 @@
 package com.cavetale.quests.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -41,5 +43,41 @@ public final class Text {
 
     public static String toCamelCase(Enum en) {
         return toCamelCase(en.name().split("_"));
+    }
+
+    public static String getProgressString(int amount, int required) {
+        return required > 1
+            ? (amount >= required
+               ? "&9" + amount + "/" + Math.max(1, required)
+               : "&1" + amount + "&8/&1" + Math.max(1, required))
+            : (amount == 0
+               ? "&4\u2610"
+               : "&2\u2611");
+    }
+
+    public static List<String> wrapLine(String what, int maxLineLength) {
+        String[] words = what.split("\\s+");
+        List<String> lines = new ArrayList<>();
+        if (words.length == 0) return lines;
+        StringBuilder line = new StringBuilder(words[0]);
+        int lineLength = ChatColor.stripColor(words[0]).length();
+        String lastColors = "";
+        for (int i = 1; i < words.length; ++i) {
+            String word = words[i];
+            int wordLength = ChatColor.stripColor(word).length();
+            if (lineLength + wordLength + 1 > maxLineLength) {
+                String lineStr = lastColors + line.toString();
+                lines.add(lineStr);
+                lastColors = org.bukkit.ChatColor.getLastColors(lineStr);
+                line = new StringBuilder(word);
+                lineLength = wordLength;
+            } else {
+                line.append(" ");
+                line.append(word);
+                lineLength += wordLength + 1;
+            }
+        }
+        if (line.length() > 0) lines.add(lastColors + line.toString());
+        return lines;
     }
 }

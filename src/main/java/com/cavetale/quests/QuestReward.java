@@ -98,7 +98,7 @@ public final class QuestReward {
     }
 
     public void showPreview(Player player, QuestInstance questInstance) {
-        List<ItemStack> itemStacks = getItemStacks();
+        List<ItemStack> itemStacks = new ArrayList<>(getItemStacks());
         if (money >= 0.01) {
             ItemStack item = new ItemStack(Material.EMERALD);
             Items.glow(item);
