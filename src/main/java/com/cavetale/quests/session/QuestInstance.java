@@ -219,7 +219,7 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     public boolean setAccepted() {
         if (row.isAccepted()) return false;
         row.setAccepted(true);
-        session.getPlugin().getDatabase().getDb().saveAsync(row, null, "accepted");
+        session.getPlugin().getDatabase().getDb().updateAsync(row, null, "accepted");
         return true;
     }
 
@@ -229,7 +229,7 @@ public final class QuestInstance implements Comparable<QuestInstance> {
     public boolean setComplete() {
         if (row.isComplete()) return false;
         row.setComplete(true);
-        session.getPlugin().getDatabase().getDb().saveAsync(row, null, "complete");
+        session.getPlugin().getDatabase().getDb().updateAsync(row, null, "complete");
         return true;
     }
 
