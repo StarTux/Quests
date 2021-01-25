@@ -116,6 +116,10 @@ public final class QuestReward {
         gui.onClose(unused -> Bukkit.getScheduler().runTask(QuestsPlugin.getInst(), () -> {
                     questInstance.getSession().getQuestBook().openBook(questInstance);
                 }));
+        gui.setItem(Gui.OUTSIDE, null, unused -> {
+                Bukkit.getScheduler().runTask(QuestsPlugin.getInst(), () -> player.closeInventory());
+                return true;
+            });
         gui.open(player);
     }
 

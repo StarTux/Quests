@@ -176,7 +176,7 @@ public final class QuestBook {
             if (row.isFocus()) {
                 cb.append("[Unfocus]").color(ChatColor.DARK_GRAY);
                 cb.event(Text.tooltip(ChatColor.BLUE + "Stop focussing this quest"));
-                cb.event(Text.button("/quest unfocus"));
+                cb.event(Text.button("/quest unfocus " + row.getId()));
             } else {
                 cb.append("[Focus]").color(ChatColor.BLUE);
                 cb.event(Text.tooltip(ChatColor.BLUE + "Focus this quest"));

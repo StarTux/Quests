@@ -145,10 +145,19 @@ public final class QuestsCommand implements TabExecutor {
     }
 
     boolean unfocus(Player player, String[] args) {
-        if (args.length != 0) return true;
+        if (args.length != 1) return true;
+        int questId;
+        try {
+            questId = Integer.parseInt(args[0]);
+        } catch (NumberFormatException nfe) {
+            return true;
+        }
+        QuestInstance questInstance = plugin.sessions.of(player).findQuest(questId);
+        if (questInstance == null) return true;
         for (QuestInstance otherInstance : plugin.sessions.of(player).getQuests()) {
             otherInstance.setFocus(false);
         }
+        plugin.sessions.of(player).getQuestBook().openBook(questInstance);
         return true;
     }
 }
