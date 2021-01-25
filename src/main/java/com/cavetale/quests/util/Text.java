@@ -80,4 +80,14 @@ public final class Text {
         if (line.length() > 0) lines.add(lastColors + line.toString());
         return lines;
     }
+
+    public static ChatColor brighten(ChatColor color) {
+        if (color == ChatColor.DARK_AQUA) return ChatColor.AQUA;
+        if (color == ChatColor.DARK_BLUE) return ChatColor.BLUE;
+        if (color == ChatColor.DARK_GRAY) return ChatColor.GRAY;
+        if (color == ChatColor.DARK_GREEN) return ChatColor.GREEN;
+        if (color == ChatColor.DARK_PURPLE) return ChatColor.LIGHT_PURPLE;
+        if (color == ChatColor.DARK_RED) return ChatColor.RED;
+        return color;
+    }
 }

@@ -132,7 +132,7 @@ public final class QuestBook {
         if (quest.getTag().getDescription() != null) {
             cb.append("\n").reset();
             cb.append(quest.getTag().getDescription()).color(ChatColor.DARK_GRAY);
-            if (quest.getGoals().size() > 1) {
+            if (row.isAccepted() && quest.getGoals().size() > 1) {
                 cb.append(" ").reset();
                 String prog = Text.getProgressString(questInstance.getState().getTag().getCurrentGoal() + 1,
                                                      quest.getGoals().size());

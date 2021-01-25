@@ -29,7 +29,8 @@ public final class ProgressBar {
     void onNewGoal() {
         visibilityTimeout = 0L;
         bossBar.setVisible(false);
-        bossBar.setTitle(Text.colorize(questInstance.getCurrentGoal().getDescription()));
+        bossBar.setTitle(Text.brighten(questInstance.getQuest().getCategory().color)
+                         + Text.colorize(questInstance.getCurrentGoal().getDescription()));
         double prog = (double) questInstance.getCurrentProgress().getAmount()
             / (double) Math.max(1, questInstance.getCurrentGoal().getAmount());
         bossBar.setProgress(Math.max(0.0, Math.min(1.0, prog)));

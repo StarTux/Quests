@@ -2,6 +2,7 @@ package com.cavetale.quests;
 
 import com.cavetale.core.command.CommandNode;
 import com.cavetale.quests.goal.GoalType;
+import com.cavetale.quests.goal.KillMobGoal;
 import com.cavetale.quests.goal.RegularGoalHolder;
 import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.session.Session;
@@ -11,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -43,6 +45,11 @@ public final class AdminCommand implements TabExecutor {
             RegularGoalHolder holder = (RegularGoalHolder) goalType.holder;
             Quest dailyQuest = holder.newDailyQuest();
             dailyQuest.getReward().setMoney(100.0);
+            if (goalType == GoalType.KILL_MOB) {
+                KillMobGoal goal = (KillMobGoal) dailyQuest.getGoals().get(0);
+                goal.setEntityType(EntityType.ZOGLIN);
+                goal.setWeaponType(KillMobGoal.WeaponType.MELEE);
+            }
             plugin.sessions.of(player).addNewQuest(dailyQuest);
             count += 1;
             Quest weeklyQuest = holder.newWeeklyQuest();

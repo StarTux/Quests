@@ -47,9 +47,8 @@ public final class BreedEntityGoal extends Goal {
                 entityTypes = Arrays.asList(EntityType.BEE, EntityType.CAT, EntityType.CHICKEN, EntityType.COW,
                                             EntityType.DONKEY, EntityType.FOX, EntityType.HOGLIN, EntityType.HORSE,
                                             EntityType.LLAMA, EntityType.MULE, EntityType.MUSHROOM_COW,
-                                            EntityType.PANDA, EntityType.PARROT, EntityType.PIG,
-                                            EntityType.POLAR_BEAR, EntityType.RABBIT, EntityType.SHEEP,
-                                            EntityType.STRIDER, EntityType.TURTLE, EntityType.WOLF);
+                                            EntityType.PANDA, EntityType.PARROT, EntityType.PIG, EntityType.RABBIT,
+                                            EntityType.SHEEP, EntityType.STRIDER, EntityType.TURTLE, EntityType.WOLF);
             }
             return entityTypes;
         }

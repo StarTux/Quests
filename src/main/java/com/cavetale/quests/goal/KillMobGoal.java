@@ -17,7 +17,6 @@ import lombok.Getter;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SpectralArrow;
@@ -27,6 +26,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -49,7 +49,7 @@ public final class KillMobGoal extends Goal {
         public String getVerb() {
             switch (this) {
             case SWORD: case AXE: case MELEE: return "Slay";
-            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Hunt";
+            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Shoot";
             default: return "Kill";
             }
         }
@@ -59,6 +59,13 @@ public final class KillMobGoal extends Goal {
             case SWORD: case AXE: case MELEE: return "Slayer";
             case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Hunter";
             default: return "Killer";
+            }
+        }
+
+        public String getPreposition() {
+            switch (this) {
+            case MELEE: return "in ";
+            default: return "with";
             }
         }
 
@@ -73,12 +80,35 @@ public final class KillMobGoal extends Goal {
             ? description
             : ((weaponType != null ? weaponType.getVerb() : "Kill")
                + " " + Entities.singularOrPlural(entityType, amount)
-               + (weaponType != null ? " via " + weaponType.getHumanName() : ""));
+               + (weaponType != null
+                  ? " " + weaponType.getPreposition() + " " + weaponType.getHumanName()
+                  : ""));
     }
 
-    public boolean onDeadlyDamage(QuestInstance questInstance, EntityDamageByEntityEvent event, Projectile projectile) {
+    public boolean onKill(QuestInstance questInstance, EntityDeathEvent event) {
         if (entityType != event.getEntity().getType()) return false;
-        if (weaponType != null && !checkWeaponType(questInstance, event, projectile)) return false;
+        if (!(event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent)) return false;
+        EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
+        final Player player;
+        final Projectile projectile;
+        switch (event2.getCause()) {
+        case ENTITY_ATTACK:
+        case ENTITY_SWEEP_ATTACK:
+            if (!(event2.getDamager() instanceof Player)) return false;
+            player = (Player) event2.getDamager();
+            projectile = null;
+            break;
+        case PROJECTILE:
+            if (!(event2.getDamager() instanceof Projectile)) return false;
+            projectile = (Projectile) event2.getDamager();
+            if (!(projectile.getShooter() instanceof Player)) return false;
+            player = (Player) projectile.getShooter();
+            break;
+        default:
+            return false;
+        }
+        if (!player.equals(questInstance.getSession().getPlayer())) return false;
+        if (weaponType != null && !checkWeaponType(questInstance, event2.getCause(), projectile)) return false;
         questInstance.increaseAmount();
         return true;
     }
@@ -93,8 +123,7 @@ public final class KillMobGoal extends Goal {
         }
     }
 
-    public boolean checkWeaponType(QuestInstance questInstance, EntityDamageByEntityEvent event, Projectile projectile) {
-        DamageCause cause = event.getCause();
+    public boolean checkWeaponType(QuestInstance questInstance, DamageCause cause, Projectile projectile) {
         if (weaponType == null) return true;
         switch (weaponType) {
         case SWORD: {
@@ -132,7 +161,7 @@ public final class KillMobGoal extends Goal {
                                  EntityType.GHAST, EntityType.GUARDIAN, EntityType.HOGLIN, EntityType.HUSK,
                                  EntityType.MAGMA_CUBE, EntityType.SKELETON, EntityType.SLIME, EntityType.SPIDER,
                                  EntityType.CAVE_SPIDER, EntityType.STRAY, EntityType.WITCH,
-                                 EntityType.WITHER_SKELETON, EntityType.ZOGLIN, EntityType.ZOMBIE_VILLAGER);
+                                 EntityType.WITHER_SKELETON, EntityType.ZOMBIE_VILLAGER);
         }
 
         public WeaponType randomWeaponType() {
@@ -168,8 +197,8 @@ public final class KillMobGoal extends Goal {
             quest.setCategory(QuestCategory.WEEKLY);
             quest.setTitle(weaponType.getHumanName() + " Training");
             int amount = 5;
-            quest.setDescription(weaponType.getVerb() + " " + amount
-                                 + " different mobs via " + weaponType.getHumanName());
+            quest.setDescription(weaponType.getVerb() + " " + amount + " different mobs "
+                                 + weaponType.getPreposition() + " " + weaponType.getHumanName());
             for (int i = 0; i < amount; i += 1) {
                 KillMobGoal goal = (KillMobGoal) GoalType.KILL_MOB.newGoal();
                 EntityType entityType = list.get(i);
@@ -185,30 +214,12 @@ public final class KillMobGoal extends Goal {
 
     public static final class EventListener implements Listener {
         @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-        void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-            if (!(event.getEntity() instanceof Mob)) return;
-            Mob mob = (Mob) event.getEntity();
-            if (event.getFinalDamage() < mob.getHealth()) return;
-            final Player player;
-            final Projectile projectile;
-            switch (event.getCause()) {
-            case ENTITY_ATTACK:
-            case ENTITY_SWEEP_ATTACK:
-                if (!(event.getDamager() instanceof Player)) return;
-                player = (Player) event.getDamager();
-                projectile = null;
-                break;
-            case PROJECTILE:
-                if (!(event.getDamager() instanceof Projectile)) return;
-                projectile = (Projectile) event.getDamager();
-                if (!(projectile.getShooter() instanceof Player)) return;
-                player = (Player) projectile.getShooter();
-                break;
-            default: return;
-            }
+        void onEntityDeath(EntityDeathEvent event) {
+            final Player player = event.getEntity().getKiller();
+            if (player == null) return;
             for (QuestInstance questInstance : QuestInstance.of(player, KillMobGoal.class)) {
                 KillMobGoal goal = (KillMobGoal) questInstance.getCurrentGoal();
-                goal.onDeadlyDamage(questInstance, event, projectile);
+                goal.onKill(questInstance, event);
             }
         }
     }
