@@ -52,7 +52,6 @@ public final class Sessions implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     void onPlayerQuit(PlayerQuitEvent event) {
-        System.out.println("Quests.Sessions.onPlayerQuit " + event.getPlayer().getName());
         Player player = event.getPlayer();
         Session session = sessions.remove(player.getUniqueId());
         if (session != null) session.disable();
