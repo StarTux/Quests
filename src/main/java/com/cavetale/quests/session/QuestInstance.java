@@ -136,9 +136,12 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      * current Goal is reached, trigger the completion of the current
      * goal.
      */
-    public void increaseAmount() {
+    public void increaseAmount(int amount) {
+        if (amount == 0) return;
+        Goal goal = getCurrentGoal();
         Progress progress = getCurrentProgress();
-        progress.increaseAmount();
+        int newAmount = Math.min(Math.max(1, goal.getAmount()), progress.getAmount() + amount);
+        progress.setAmount(newAmount);
         if (progress.getAmount() >= getCurrentGoal().getAmount()) {
             completeGoal();
         } else {
@@ -149,6 +152,10 @@ public final class QuestInstance implements Comparable<QuestInstance> {
         }
         progressBar.showProgress();
         saveStateToDatabase();
+    }
+
+    public void increaseAmount() {
+        increaseAmount(1);
     }
 
     /**

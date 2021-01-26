@@ -14,8 +14,4 @@ public class Progress {
     public final String serialize() {
         return Json.serialize(this);
     }
-
-    public final void increaseAmount() {
-        amount += 1;
-    }
 }

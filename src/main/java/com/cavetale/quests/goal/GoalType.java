@@ -9,7 +9,8 @@ public enum GoalType {
     KILL_MOB(new KillMobGoal.Holder()),
     CATCH_FISH(new CatchFishGoal.Holder()),
     ENCHANT_ITEM(new EnchantItemGoal.Holder()),
-    GROW_TREE(new GrowTreeGoal.Holder());
+    GROW_TREE(new GrowTreeGoal.Holder()),
+    COOK_ITEM(new CookItemGoal.Holder());
 
     public final GoalHolder holder;
 
