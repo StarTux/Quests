@@ -6,7 +6,9 @@ public enum GoalType {
     MINE_BLOCK(new MineBlockGoal.Holder()),
     BREED_ENTITY(new BreedEntityGoal.Holder()),
     EAT(new EatGoal.Holder()),
-    KILL_MOB(new KillMobGoal.Holder());
+    KILL_MOB(new KillMobGoal.Holder()),
+    CATCH_FISH(new CatchFishGoal.Holder()),
+    ENCHANT_ITEM(new EnchantItemGoal.Holder());
 
     public final GoalHolder holder;
 

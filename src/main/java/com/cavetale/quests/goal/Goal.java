@@ -21,6 +21,14 @@ public abstract class Goal {
     }
 
     /**
+     * Check the validity of the goal settings.
+     * This will only make sure that a goal can be executed without
+     * causing an error. It will not guarantee that a goal is actually
+     * achievable.
+     */
+    public abstract boolean isValid();
+
+    /**
      * Override to perform an action every tick.
      */
     public void onTick() { }

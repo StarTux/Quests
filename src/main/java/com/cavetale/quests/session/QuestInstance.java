@@ -155,12 +155,13 @@ public final class QuestInstance implements Comparable<QuestInstance> {
      * Move on to the next goal or mark the current quest as completed.
      */
     public void completeGoal() {
+        Goal oldGoal = getCurrentGoal();
         Progress progress = getCurrentProgress();
         int newGoalIndex = state.getTag().getCurrentGoal() + 1;
         if (newGoalIndex < quest.getGoals().size()) {
             // Next goal
             state.getTag().setCurrentGoal(newGoalIndex);
-            session.getPlayer().sendMessage("Goal complete!");
+            session.getPlayer().sendMessage("Goal complete: " + ChatColor.GOLD + oldGoal.getDescription());
             progressBar.onNewGoal();
             session.getPlayer().playSound(session.getPlayer().getLocation(),
                                           Sound.ENTITY_PLAYER_LEVELUP,

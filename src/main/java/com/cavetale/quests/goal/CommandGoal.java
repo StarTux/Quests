@@ -21,6 +21,11 @@ public final class CommandGoal extends Goal {
     private List<String> arguments;
     private boolean registered; // Must be an actual command?
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
     public boolean onCommand(QuestInstance questInstance, PlayerCommandPreprocessEvent event) {
         if (command == null) return false;
         String[] toks = event.getMessage().split("\\s+");

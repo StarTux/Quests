@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -29,6 +30,17 @@ public final class Items {
         return material.isItem()
             ? new ItemStack(material).getI18NDisplayName()
             : Stream.of(material.name().split("_")).map(Text::toCamelCase).collect(Collectors.joining(" "));
+    }
+
+    public static String getName(EnchantmentTarget enchantmentTarget) {
+        switch (enchantmentTarget) {
+        case ALL: return "Anything";
+        case ARMOR_FEET: return "Boots";
+        case ARMOR_HEAD: return "Helmet";
+        case ARMOR_LEGS: return "Leggings";
+        case ARMOR_TORSO: return "Chestplate";
+        default: return Text.toCamelCase(enchantmentTarget);
+        }
     }
 
     public static void setTooltip(ItemStack itemStack, String tooltip) {

@@ -38,18 +38,29 @@ public final class QuestBook {
                     return;
                 }
                 // Make index
-                ComponentBuilder cb = new ComponentBuilder();
+                List<ComponentBuilder> indexes = new ArrayList<>();
                 Map<QuestCategory, List<QuestInstance>> categories = new EnumMap<>(QuestCategory.class);
                 for (QuestInstance questInstance : quests) {
                     categories.computeIfAbsent(questInstance.getQuest().getCategory(), cat -> new ArrayList<>())
                         .add(questInstance);
                 }
                 Map<Integer, BaseComponent> clickMap = new HashMap<>();
+                int linum = 1;
+                ComponentBuilder cb = new ComponentBuilder();
+                indexes.add(cb);
                 for (QuestCategory category : QuestCategory.values()) {
                     List<QuestInstance> list = categories.get(category);
                     if (list == null || list.isEmpty()) continue;
+                    if (linum > 1 && linum + list.size() + 1 > 10) {
+                        cb.append("...").color(ChatColor.DARK_GRAY);
+                        meta.spigot().addPage(cb.create());
+                        cb = new ComponentBuilder();
+                        indexes.add(cb);
+                        linum = 1;
+                    }
                     cb.append(category.humanName).color(category.color).bold(true);
                     cb.append("\n").reset();
+                    linum += 1;
                     for (QuestInstance questInstance : list) {
                         Quest quest = questInstance.getQuest();
                         QuestState questState = questInstance.getState();
@@ -74,6 +85,8 @@ public final class QuestBook {
                         cb.event(Text.tooltip(quest.getTitle()));
                         clickMap.put(questInstance.getRow().getId(), cb.getCurrentComponent());
                         cb.append("\n").reset();
+                        linum += 1;
+                        if (quest.getTitle().length() > 18) linum += 1;
                     }
                 }
                 meta.spigot().addPage(cb.create());
@@ -87,7 +100,9 @@ public final class QuestBook {
                     cb2.event(Text.bookmark(1));
                     meta.spigot().addPage(cb2.create());
                 }
-                meta.spigot().setPage(1, cb.create());
+                for (int i = 0; i < indexes.size(); i += 1) {
+                    meta.spigot().setPage(i + 1, indexes.get(i).create());
+                }
             });
         session.getPlayer().openBook(bookStack);
         for (QuestInstance questInstance : quests) {

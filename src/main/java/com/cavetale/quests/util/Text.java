@@ -7,6 +7,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.NamespacedKey;
 
 public final class Text {
     private Text() { }
@@ -39,6 +40,10 @@ public final class Text {
             out[i] = toCamelCase(in[i]);
         }
         return String.join(" ", out);
+    }
+
+    public static String toCamelCase(NamespacedKey key) {
+        return toCamelCase(key.getKey().split("_"));
     }
 
     public static String toCamelCase(Enum en) {
@@ -89,5 +94,21 @@ public final class Text {
         if (color == ChatColor.DARK_PURPLE) return ChatColor.LIGHT_PURPLE;
         if (color == ChatColor.DARK_RED) return ChatColor.RED;
         return color;
+    }
+
+    public static String roman(int numeral) {
+        switch (numeral) {
+        case 1: return "I";
+        case 2: return "II";
+        case 3: return "III";
+        case 4: return "IV";
+        case 5: return "V";
+        case 6: return "VI";
+        case 7: return "VII";
+        case 8: return "VIII";
+        case 9: return "IX";
+        case 10: return "X";
+        default: return "" + numeral;
+        }
     }
 }

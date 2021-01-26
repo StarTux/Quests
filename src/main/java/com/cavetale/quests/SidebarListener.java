@@ -36,7 +36,7 @@ public final class SidebarListener implements Listener {
             }
         }
         if (focus != null) {
-            String longLine =  ChatColor.GOLD + "Quest: " + ChatColor.GRAY + focus.getCurrentGoal().getDescription();
+            String longLine =  ChatColor.GOLD + "/quest" + ChatColor.GRAY + ": " + focus.getCurrentGoal().getDescription();
             event.addLines(plugin, Priority.DEFAULT, Text.wrapLine(longLine, 18));
         } else if (notClaimed > 0) {
             event.addLines(plugin, Priority.HIGH, ChatColor.GOLD + "You have a " + ChatColor.WHITE + "/quest" + ChatColor.GOLD + " reward");

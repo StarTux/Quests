@@ -37,41 +37,9 @@ public final class KillMobGoal extends Goal {
     private EntityType entityType;
     private WeaponType weaponType;
 
-    public enum WeaponType {
-        SWORD,
-        AXE,
-        MELEE,
-        ARROW,
-        BOW,
-        CROSSBOW,
-        TRIDENT;
-
-        public String getVerb() {
-            switch (this) {
-            case SWORD: case AXE: case MELEE: return "Slay";
-            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Shoot";
-            default: return "Kill";
-            }
-        }
-
-        public String getKiller() {
-            switch (this) {
-            case SWORD: case AXE: case MELEE: return "Slayer";
-            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Hunter";
-            default: return "Killer";
-            }
-        }
-
-        public String getPreposition() {
-            switch (this) {
-            case MELEE: return "in ";
-            default: return "with";
-            }
-        }
-
-        public String getHumanName() {
-            return Text.toCamelCase(this);
-        }
+    @Override
+    public boolean isValid() {
+        return entityType != null;
     }
 
     @Override
@@ -221,6 +189,43 @@ public final class KillMobGoal extends Goal {
                 KillMobGoal goal = (KillMobGoal) questInstance.getCurrentGoal();
                 goal.onKill(questInstance, event);
             }
+        }
+    }
+
+    public enum WeaponType {
+        SWORD,
+        AXE,
+        MELEE,
+        ARROW,
+        BOW,
+        CROSSBOW,
+        TRIDENT;
+
+        public String getVerb() {
+            switch (this) {
+            case SWORD: case AXE: case MELEE: return "Slay";
+            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Shoot";
+            default: return "Kill";
+            }
+        }
+
+        public String getKiller() {
+            switch (this) {
+            case SWORD: case AXE: case MELEE: return "Slayer";
+            case ARROW: case BOW: case CROSSBOW: case TRIDENT: return "Hunter";
+            default: return "Killer";
+            }
+        }
+
+        public String getPreposition() {
+            switch (this) {
+            case MELEE: return "in ";
+            default: return "with";
+            }
+        }
+
+        public String getHumanName() {
+            return Text.toCamelCase(this);
         }
     }
 }

@@ -22,11 +22,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
+/**
+ * Mine some block; presumably ore.
+ * The material cannot be null. "blockData" is optional.
+ */
 @Data @EqualsAndHashCode(callSuper = true)
 public final class MineBlockGoal extends Goal {
     private Material material;
     private String blockData;
     private boolean natural;
+
+    @Override
+    public boolean isValid() {
+        return material != null;
+    }
 
     @Override
     public String getDescription() {

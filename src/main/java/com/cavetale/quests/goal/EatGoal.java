@@ -25,6 +25,11 @@ public final class EatGoal extends Goal {
     private Material material;
 
     @Override
+    public boolean isValid() {
+        return material != null;
+    }
+
+    @Override
     public String getDescription() {
         return description != null
             ? description

@@ -16,6 +16,11 @@ public final class ChatGoal extends Goal {
     private String message;
     private boolean caseInsensitive;
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
     public boolean onChat(QuestInstance questInstance, AsyncPlayerChatEvent event) {
         if (message != null) {
             if (caseInsensitive) {

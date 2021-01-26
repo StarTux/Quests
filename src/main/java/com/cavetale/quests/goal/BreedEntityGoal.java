@@ -24,6 +24,11 @@ public final class BreedEntityGoal extends Goal {
     private EntityType entityType;
 
     @Override
+    public boolean isValid() {
+        return entityType != null;
+    }
+
+    @Override
     public String getDescription() {
         return description != null
             ? description
