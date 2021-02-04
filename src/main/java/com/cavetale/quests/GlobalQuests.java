@@ -46,6 +46,7 @@ public final class GlobalQuests {
         }
         plugin.getDatabase().getDb().find(SQLGlobalQuests.class)
             .eq("category", category.key)
+            .eq("time_id", newTimeId)
             .findUniqueAsync(row -> {
                     if (newTimeId != Timer.getTimeId(category)) {
                         log("find row: time id changed");
