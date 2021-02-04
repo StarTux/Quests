@@ -111,4 +111,12 @@ public final class Text {
         default: return "" + numeral;
         }
     }
+
+    public static String formatTimespan(long span) {
+        long seconds = span / 1000L;
+        long minutes = seconds / 60L;
+        long hours = minutes / 60L;
+        long days = hours / 24L;
+        return String.format("%dd %dh %dm", days, hours % 24L, minutes % 60L);
+    }
 }

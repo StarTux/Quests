@@ -32,5 +32,9 @@ public final class QuestsTest {
 
         System.out.println("str equals=" + Objects.equals(json, json2));
         System.out.println("obj equals=" + Objects.equals(quest, quest2));
+
+        Timer timer = new Timer();
+        timer.init();
+        timer.debug();
     }
 }

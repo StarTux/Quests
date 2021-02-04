@@ -2,6 +2,7 @@ package com.cavetale.quests.session;
 
 import com.cavetale.quests.Quest;
 import com.cavetale.quests.QuestState;
+import com.cavetale.quests.Timer;
 import com.cavetale.quests.goal.Goal;
 import com.cavetale.quests.goal.Progress;
 import com.cavetale.quests.sql.SQLQuest;
@@ -102,11 +103,15 @@ public final class QuestInstance implements Comparable<QuestInstance> {
         return true;
     }
 
+    public boolean isExpired() {
+        return row.getExpiry() != null && row.getExpiry().getTime() < Timer.getInst().getNow();
+    }
+
     /**
      * Ready to be accepted and saved.
      */
     public boolean isReady() {
-        return row.getId() != null && enabled;
+        return row.getId() != null && enabled && !isExpired();
     }
 
     /**

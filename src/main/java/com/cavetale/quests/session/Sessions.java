@@ -1,5 +1,6 @@
 package com.cavetale.quests.session;
 
+import com.cavetale.quests.GlobalQuests;
 import com.cavetale.quests.QuestsPlugin;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +61,13 @@ public final class Sessions implements Listener {
     void tick() {
         for (Session session : sessions.values()) {
             session.tick();
+        }
+    }
+
+    public void updateAll(GlobalQuests globalQuests) {
+        for (Session session : sessions.values()) {
+            session.removeObsoleteQuests();
+            session.update(globalQuests);
         }
     }
 }

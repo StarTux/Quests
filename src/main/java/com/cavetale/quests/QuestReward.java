@@ -24,6 +24,7 @@ public final class QuestReward {
     List<Item> items;
     double money;
     List<String> commands;
+    int experience;
 
     public boolean addItemStack(ItemStack itemStack) {
         if (itemStack == null || itemStack.getAmount() == 0) return false;
@@ -105,6 +106,11 @@ public final class QuestReward {
             Items.setTooltip(item, ChatColor.GOLD + GenericEvents.formatMoney(money));
             itemStacks.add(item);
         }
+        if (experience > 0) {
+            ItemStack item = new ItemStack(Material.EXPERIENCE_BOTTLE);
+            Items.setTooltip(item, "" + ChatColor.GREEN + experience + " exp");
+            itemStacks.add(item);
+        }
         int amount = itemStacks.size();
         int rows = (amount - 1) / 9 + 1;
         Gui gui = new Gui()
@@ -152,6 +158,10 @@ public final class QuestReward {
         giveMoney(player, quest);
         runCommands(player);
         playSound(player);
+        if (experience > 0) {
+            player.giveExp(experience, true);
+            player.sendMessage("Received " + ChatColor.GREEN + experience + ChatColor.WHITE + " exp");
+        }
     }
 
     void onClose(Player player, Gui gui, Quest quest) {

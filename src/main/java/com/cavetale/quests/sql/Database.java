@@ -12,7 +12,7 @@ public final class Database {
 
     public void enable() {
         db = new SQLDatabase(plugin);
-        db.registerTables(SQLQuest.class);
+        db.registerTables(SQLQuest.class, SQLPlayer.class, SQLGlobalQuests.class);
         db.createAllTables();
     }
 

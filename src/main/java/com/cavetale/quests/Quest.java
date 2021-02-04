@@ -30,6 +30,7 @@ public final class Quest {
          * player's completed quests storage.
          */
         private String key;
+        private Long expiry;
     }
 
     public static Quest newInstance() {

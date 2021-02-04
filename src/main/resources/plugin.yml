@@ -36,3 +36,11 @@ permissions:
   quests.admin:
     description: Use /questsadmin
     default: op
+
+  quests.daily:
+    description: Get daily quests
+    default: false
+
+  quests.weekly:
+    description: Get weekly quests
+    default: false

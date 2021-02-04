@@ -38,11 +38,16 @@ public final class SQLQuest {
     private boolean claimed;
     @Column(nullable = false)
     private Date created;
+    @Column(nullable = true)
+    private Date expiry;
 
     public void store(final Quest theQuest) {
         this.quest = theQuest.serialize();
         this.category = theQuest.getCategory().key;
         this.index = theQuest.getIndex();
+        if (theQuest.getTag().getExpiry() != null) {
+            expiry = new Date(theQuest.getTag().getExpiry());
+        }
     }
 
     public void store(final QuestState theState) {

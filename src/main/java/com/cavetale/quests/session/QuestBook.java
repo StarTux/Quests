@@ -3,6 +3,7 @@ package com.cavetale.quests.session;
 import com.cavetale.quests.Quest;
 import com.cavetale.quests.QuestCategory;
 import com.cavetale.quests.QuestState;
+import com.cavetale.quests.Timer;
 import com.cavetale.quests.goal.Goal;
 import com.cavetale.quests.goal.Progress;
 import com.cavetale.quests.sql.SQLQuest;
@@ -153,6 +154,11 @@ public final class QuestBook {
                                                      quest.getGoals().size());
                 cb.append(Text.colorize(prog));
             }
+        }
+        if (row.getExpiry() != null) {
+            cb.append("\n").reset();
+            cb.append("Time left " + Text.formatTimespan(row.getExpiry().getTime() - Timer.getInst().getNow()))
+                .color(ChatColor.DARK_GRAY);
         }
         if (row.isAccepted() || quest.getGoals().size() == 1) {
             cb.append("\n\n").reset();

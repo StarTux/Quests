@@ -35,7 +35,7 @@ public final class GrowTreeGoal extends Goal {
     public String getDescription() {
         return description != null
             ? description
-            : "Grow " + Items.getName(blockType) + " with bonemeal";
+            : "Grow " + getTreeName(blockType) + " with bonemeal";
     }
 
     public boolean onStructureGrow(QuestInstance questInstance, Block block) {
