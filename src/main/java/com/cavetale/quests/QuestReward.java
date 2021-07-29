@@ -1,9 +1,9 @@
 package com.cavetale.quests;
 
+import com.cavetale.money.Money;
 import com.cavetale.quests.gui.Gui;
 import com.cavetale.quests.session.QuestInstance;
 import com.cavetale.quests.util.Items;
-import com.winthier.generic_events.GenericEvents;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -103,7 +103,7 @@ public final class QuestReward {
         if (money >= 0.01) {
             ItemStack item = new ItemStack(Material.EMERALD);
             Items.glow(item);
-            Items.setTooltip(item, ChatColor.GOLD + GenericEvents.formatMoney(money));
+            Items.setTooltip(item, ChatColor.GOLD + Money.format(money));
             itemStacks.add(item);
         }
         if (experience > 0) {
@@ -131,10 +131,10 @@ public final class QuestReward {
 
     void giveMoney(Player player, Quest quest) {
         if (money < 0.01) return;
-        GenericEvents.givePlayerMoney(player.getUniqueId(), money, QuestsPlugin.getInst(),
-                                      "Quest Reward: " + quest.getTitle());
+        Money.give(player.getUniqueId(), money, QuestsPlugin.getInst(),
+                   "Quest Reward: " + quest.getTitle());
         player.sendMessage("Received "
-                           + ChatColor.GOLD + GenericEvents.formatMoney(money)
+                           + ChatColor.GOLD + Money.format(money)
                            + ChatColor.WHITE + ": " + quest.getTitle());
     }
 

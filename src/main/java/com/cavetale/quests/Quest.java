@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import lombok.Data;
 
 @Data
@@ -105,7 +104,6 @@ public final class Quest {
         tag.title = title;
     }
 
-    @Nullable
     public String getDescription() {
         return tag.description;
     }

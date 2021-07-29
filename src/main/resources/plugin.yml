@@ -3,12 +3,12 @@ main: com.cavetale.quests.QuestsPlugin
 name: Quests
 version: 0.1
 description: Quests Plugin
-api-version: 1.13
+api-version: 1.17
 
 author: StarTux
 website: https://github.com/StarTux/Quests
 
-depend: [SQL, Core, GenericEvents, Exploits]
+depend: [SQL, Core, Money, Exploits]
 softdepend: [Sidebar]
 
 commands:
